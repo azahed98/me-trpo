@@ -74,7 +74,9 @@ if __name__ == '__main__':
                        'hopper',
                        'ant',
                        'swimmer',
-                       'humanoid']:
+                       'humanoid',
+                       'pusher',
+                       'reacher']:
         param_path = os.path.join(working_dir,
                                   'sandbox/thanard/me-trpo/params/params-%s.json' % options.env)
     else:
