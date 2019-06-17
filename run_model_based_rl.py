@@ -77,8 +77,9 @@ if __name__ == '__main__':
                        'humanoid',
                        'pusher',
                        'reacher']:
-        param_path = os.path.join(working_dir,
-                                  'sandbox/thanard/me-trpo/params/params-%s.json' % options.env)
+        # param_path = os.path.join(working_dir,
+        #                           'sandbox/thanard/me-trpo/params/params-%s.json' % options.env)
+        param_path = '/home/arsh/research/autolab/me-trpo/params/params-%s.json' % options.env
     else:
         raise ('Value Error: not implemented.')
 
@@ -174,13 +175,13 @@ if __name__ == '__main__':
         l_bfgs_exception(params)
         import colored_traceback.always
 
-        aws_config = get_aws_config(1)
+        # aws_config = get_aws_config(1)
         run_experiment_lite(
             train,
             exp_prefix=exp_prefix,
             mode=mode,
             variant=dict(mode=mode, params=params, seed=options.seed),
             dry=False,
-            snapshot_mode='last',
-            aws_config=aws_config
+            snapshot_mode='last'#,
+            # aws_config=aws_config
         )

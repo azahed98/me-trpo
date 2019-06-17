@@ -4,6 +4,9 @@ import os.path
 import rllab.misc.logger as rllab_logger
 from rllab.envs.normalized_env import normalize
 from envs import  *
+
+import sys
+sys.path.insert(0, "/home/arsh/research/rllab/")
 from sandbox.rocky.tf.envs.base import TfEnv
 
 ####################

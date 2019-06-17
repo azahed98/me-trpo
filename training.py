@@ -375,7 +375,7 @@ def train(variant):
         kwargs['algo_name'] = params['algo']
         kwargs['logstd'] = training_policy._l_std_param.param
         # Save initial policy
-        joblib.dump(training_policy, os.path.join(snapshot_dir, 'params-initial.pkl'))
+        # joblib.dump(training_policy, os.path.join(snapshot_dir, 'params-initial.pkl'))
 
         train_models(env=env,
                      dynamics_model=dynamics_model,
@@ -398,7 +398,7 @@ def train(variant):
                      **kwargs) # Make sure not to reinitialize TRPO policy.
 
         # Save the final policy
-        joblib.dump(training_policy, os.path.join(snapshot_dir, 'params.pkl'))
+        # joblib.dump(training_policy, os.path.join(snapshot_dir, 'params.pkl'))
 
     except Exception as e:
         rmtree(snapshot_dir)

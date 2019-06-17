@@ -546,7 +546,7 @@ def train_models(env,
     while True:
         itr_start_time = time.time()
         # Save params every iteration
-        joblib.dump(kwargs["saved_policy"], os.path.join(snapshot_dir, 'training_logs/params_%d.pkl' % count))
+        # joblib.dump(kwargs["saved_policy"], os.path.join(snapshot_dir, 'training_logs/params_%d.pkl' % count))
         reinit_every = int(dynamics_opt_params.reinitialize)
         if reinit_every <= 0 or count % reinit_every != 1:
             reinitialize = False
