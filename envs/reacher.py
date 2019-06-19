@@ -5,20 +5,80 @@ from __future__ import absolute_import
 import os
 
 import numpy as np
+import tensorflow as tf
 from gym import utils
-from gym.envs.mujoco import mujoco_env
+from rllab.envs.mujoco import mujoco_env
+# import mujoco_py
+# import pyximport
+# pyximport.install()
+# from .mjsim import MjSim
 
+# class MjSimLite(object):
+#     def __init__(self, model, data, nsubsteps=1,
+#                   udd_callback=None, substep_callback=None, userdata_names=None,
+#                   render_callback=None):
+#         self.nsubsteps = nsubsteps
+#         self.model = model
+#         self.data = data
 
-class Reacher3DEnv(mujoco_env.MujocoEnv, utils.EzPickle):
-    def __init__(self):
+#         self.render_contexts = []
+#         self._render_context_offscreen = None
+#         self._render_context_window = None
+#         self.udd_state = None
+#         self.udd_callback = udd_callback
+#         self.render_callback = render_callback
+#         self.extras = {}
+#         self.set_substep_callback(substep_callback, userdata_names)
+
+#     def set_state(self, value):
+#         self.data.time = value.time
+#         self.data.qpos[:] = np.copy(value.qpos)
+#         self.data.qvel[:] = np.copy(value.qvel)
+#         if self.model.na != 0:
+#             self.data.act[:] = np.copy(value.act)
+#         self.udd_state = copy.deepcopy(value.udd_state)
+
+#     def get_state(self):
+#         """ Returns a copy of the simulator state. """
+#         qpos = np.copy(self.data.qpos)
+#         qvel = np.copy(self.data.qvel)
+#         if self.model.na == 0:
+#             act = None
+#         else:
+#             act = np.copy(self.data.act)
+#         udd_state = copy.deepcopy(self.udd_state)
+
+#         return MjSimState(self.data.time, qpos, qvel, act, udd_state)
+
+class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
+    def __init__(
+            self,
+            ctrl_cost_coeff=1e-2,
+            *args, **kwargs):
         self.viewer = None
         utils.EzPickle.__init__(self)
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.goal = np.zeros(3)
-        mujoco_env.MujocoEnv.__init__(self, os.path.join(dir_path, 'assets/reacher3d.xml'), 2)
+        # mujoco_env.MujocoEnv.__init__(self, os.path.join(dir_path, 'assets/reacher3d.xml'), 2)
+        # self.sim = None
+        super(ReacherEnv, self).__init__(*args, **kwargs, file_path='/home/arsh/research/autolab/me-trpo/vendor/mujoco_models/reacher3d.xml')
+
+    # @property
+    # def n_goals(self):
+    #     '''
+    #     :return: goal dimensions
+    #     '''
+    #     return 3
+    @property
+    def n_states(self):
+        '''
+        :return: state dimensions
+        '''
+        return 17
 
     def _step(self, a):
-        self.do_simulation(a, self.frame_skip)
+        # self.do_simulation(a, self.frame_skip)
+        self.forward_dynamics(a)
         ob = self._get_obs()
         reward = np.sum(np.square(self.get_EE_pos(ob[None]) - self.goal))
         reward += 0.1 * np.square(a).sum()
@@ -28,7 +88,7 @@ class Reacher3DEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return ob, reward, done, dict(reward_dist=0, reward_ctrl=0)
 
     def step(self, a):
-        return self.step(a)
+        return self._step(a)
 
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 1
@@ -36,25 +96,54 @@ class Reacher3DEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.viewer.cam.elevation = -30
         self.viewer.cam.azimuth = 270
 
-    def reset_model(self):
+    def set_state(self, qpos, qvel):
+        assert qpos.shape == (self.model.nq,1) and qvel.shape == (self.model.nv,1)
+        # old_state = self.sim.get_state()
+        qpos = np.copy(self.model.data.qpos)
+        qvel = np.copy(self.model.data.qvel)
+        if self.model.na == 0:
+            act = None
+        else:
+            act = np.copy(self.model.data.act)
+        # udd_state = copy.deepcopy(self.udd_state)
+
+        # new_state = mujoco_py.MjSimState(old_state.time, qpos, qvel,
+        #                                  old_state.act, old_state.udd_state)
+        # self.sim.set_state(new_state)
+        # self.model.data.time = value.time
+        self.model.data.qpos[:] = np.copy(qpos)
+        self.model.data.qvel[:] = np.copy(qvel)
+        if self.model.na != 0:
+            self.model.data.act[:] = np.copy(act)
+        # self.udd_state = copy.deepcopy(value.udd_state)
+        # self.sim.forward()
+        self.model.forward()
+
+    def reset_model(self, init_pos=None):
         qpos, qvel = np.copy(self.init_qpos), np.copy(self.init_qvel)
-        qpos[-3:] += np.random.normal(loc=0, scale=0.1, size=[3])
+        qpos[-3:] += np.random.normal(loc=0, scale=0.1, size=[3,1])
         qvel[-3:] = 0
         self.goal = qpos[-3:]
-        self.set_state(qpos, qvel)
-        return self._get_obs()
+        init_state = np.vstack([qpos, qvel, np.zeros(shape=(17,1))])
+        self.reset_mujoco(init_pos)
+        # self.reset_mujoco(get_original_representation(init_state))
+        self.model.forward()
+        self.current_com = self.model.data.com_subtree[0]
+        self.dcom = np.zeros_like(self.current_com)
+        return self.get_current_obs()
+        # self.set_state(qpos, qvel)
 
-    def reset(self):
-        return self.reset_model()
+    def reset(self, init_pos=None):
+        return self.reset_model(init_pos)
 
     def _get_obs(self):
         return np.concatenate([
             self.model.data.qpos.flat,
-            self.model.data.qvel.flat[:-3],
+            self.model.data.qvel.flat[:-3]
         ])
 
-    def get_obs(self):
-        return self.get_obs()
+    def get_current_obs(self):
+        return self._get_obs()
 
     def get_EE_pos(self, states):
         theta1, theta2, theta3, theta4, theta5, theta6, theta7 = \
@@ -83,3 +172,65 @@ class Reacher3DEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         return cur_end
 
+    def get_EE_pos_tf(self, states):
+        # raise NotImplementedError
+        theta1, theta2, theta3, theta4, theta5, theta6, theta7 = \
+            states[:, :1], states[:, 1:2], states[:, 2:3], states[:, 3:4], states[:, 4:5], states[:, 5:6], states[:, 6:]
+
+        rot_axis = tf.concat([tf.cos(theta2) * tf.cos(theta1), tf.cos(theta2) * tf.sin(theta1), -tf.sin(theta2)],
+                                  axis=1)
+        rot_perp_axis = tf.concat([-tf.sin(theta1), tf.cos(theta1), tf.zeros_like(theta1)], axis=1)
+        cur_end = tf.concat([
+            0.1 * tf.cos(theta1) + 0.4 * tf.cos(theta1) * tf.cos(theta2),
+            0.1 * tf.sin(theta1) + 0.4 * tf.sin(theta1) * tf.cos(theta2) - 0.188,
+            -0.4 * tf.sin(theta2)
+        ], axis=1)
+
+        for length, hinge, roll in [(0.321, theta4, theta3), (0.16828, theta6, theta5)]:
+            perp_all_axis = tf.cross(rot_axis, rot_perp_axis)
+            x = tf.cos(hinge) * rot_axis
+            y = tf.sin(hinge) * tf.sin(roll) * rot_perp_axis
+            z = -tf.sin(hinge) * tf.cos(roll) * perp_all_axis
+            new_rot_axis = x + y + z
+            new_rot_perp_axis = tf.cross(new_rot_axis, rot_axis)
+            new_rot_perp_axis_norm = tf.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
+            condition = tf.less(new_rot_perp_axis_norm, 1e-30)
+            new_rot_perp_axis_norm = tf.where(condition, tf.linalg.norm(rot_perp_axis,axis=1, keepdims=True), new_rot_perp_axis_norm )
+            # new_rot_perp_axis[tf.linalg.norm(new_rot_perp_axis, axis=1) < 1e-30] = \
+            #     rot_perp_axis[tf.linalg.norm(new_rot_perp_axis, axis=1) < 1e-30]
+            new_rot_perp_axis /= new_rot_perp_axis_norm#tf.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
+            rot_axis, rot_perp_axis, cur_end = new_rot_axis, new_rot_perp_axis, cur_end + length * new_rot_axis
+
+        return cur_end
+
+    def cost_np(self, x, u, x_next, ctrl_cost_coeff=.1):
+        # assert np.amax(np.abs(u)) <= 1.0
+        assert len(x_next.shape) <= 2
+        cost = np.sum(np.square(self.get_EE_pos(x_next[-3:]) - self.goal.T))
+        cost += ctrl_cost_coeff * np.square(u).sum()
+        return cost
+        # return np.mean(np.linalg.norm(x[:, -2:]-get_fingertips(x), axis=1) +\
+        #                ctrl_cost_coeff*0.5*np.sum(np.square(u), axis=1))
+
+    def cost_tf(self, x, u, x_next, ctrl_cost_coeff=.1):
+        cost = tf.reduce_sum(tf.norm(self.get_EE_pos_tf(x_next) - self.goal.T, axis=1))
+        cost += ctrl_cost_coeff * tf.reduce_sum(tf.square(u), axis=1)
+        return cost
+        # return tf.reduce_mean(tf.norm(x[:, -2:]-get_fingertips_tf(x), axis=1) +\
+        #                ctrl_cost_coeff*0.5*tf.reduce_sum(tf.square(u), axis=1))
+
+    def cost_np_vec(self, x, u, x_next, ctrl_cost_coeff=.1):
+        # assert np.amax(np.abs(u)) <= 1.0
+        cost = np.linalg.norm(x_next[:, -3:] -  self.goal.T, axis=1)
+        cost += ctrl_cost_coeff * np.sum(np.square(u), axis=1)
+        return cost
+
+# def get_fingertips(x):
+#     x_cord = np.reshape(0.1 * np.cos(x[:, 0]) + 0.11 * np.cos(x[:, 0] + x[:, 1]), (-1, 1))
+#     y_cord = np.reshape(0.1 * np.sin(x[:, 0]) + 0.11 * np.sin(x[:, 0] + x[:, 1]), (-1, 1))
+#     return np.concatenate([x_cord, y_cord], axis=1)
+
+# def get_fingertips_tf(x):
+#     x_cord = tf.reshape(0.1 * tf.cos(x[:, 0]) + 0.11 * tf.cos(x[:, 0] + x[:, 1]), (-1, 1))
+#     y_cord = tf.reshape(0.1 * tf.sin(x[:, 0]) + 0.11 * tf.sin(x[:, 0] + x[:, 1]), (-1, 1))
+#     return tf.concat([x_cord, y_cord], axis=1)

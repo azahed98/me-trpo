@@ -32,6 +32,8 @@ def get_env(env_name):
         return TfEnv(normalize(HumanoidEnv()))
     # elif env_name == 'simple_humanoid':
     #     return TfEnv(normalize(SimpleHumanoidEnv()))
+    elif env_name == 'reacher':
+        return TfEnv(normalize(ReacherEnv()))
     else:
         assert False, "Define the env from env_name."
 

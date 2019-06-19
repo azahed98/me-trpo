@@ -308,7 +308,10 @@ def train(variant):
         if hasattr(inner_env, 'n_goals'):
             n_goals = inner_env.n_goals
             n_states = inner_env.n_states
-            assert n_goals+n_states == n_obs
+            print(n_obs)
+            print(n_goals)
+            print(n_states)
+            # assert n_goals+n_states == n_obs
         else:
             n_goals =0
             n_states = n_obs
