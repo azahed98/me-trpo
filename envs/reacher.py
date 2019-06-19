@@ -8,47 +8,6 @@ import numpy as np
 import tensorflow as tf
 from gym import utils
 from rllab.envs.mujoco import mujoco_env
-# import mujoco_py
-# import pyximport
-# pyximport.install()
-# from .mjsim import MjSim
-
-# class MjSimLite(object):
-#     def __init__(self, model, data, nsubsteps=1,
-#                   udd_callback=None, substep_callback=None, userdata_names=None,
-#                   render_callback=None):
-#         self.nsubsteps = nsubsteps
-#         self.model = model
-#         self.data = data
-
-#         self.render_contexts = []
-#         self._render_context_offscreen = None
-#         self._render_context_window = None
-#         self.udd_state = None
-#         self.udd_callback = udd_callback
-#         self.render_callback = render_callback
-#         self.extras = {}
-#         self.set_substep_callback(substep_callback, userdata_names)
-
-#     def set_state(self, value):
-#         self.data.time = value.time
-#         self.data.qpos[:] = np.copy(value.qpos)
-#         self.data.qvel[:] = np.copy(value.qvel)
-#         if self.model.na != 0:
-#             self.data.act[:] = np.copy(value.act)
-#         self.udd_state = copy.deepcopy(value.udd_state)
-
-#     def get_state(self):
-#         """ Returns a copy of the simulator state. """
-#         qpos = np.copy(self.data.qpos)
-#         qvel = np.copy(self.data.qvel)
-#         if self.model.na == 0:
-#             act = None
-#         else:
-#             act = np.copy(self.data.act)
-#         udd_state = copy.deepcopy(self.udd_state)
-
-#         return MjSimState(self.data.time, qpos, qvel, act, udd_state)
 
 class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(
@@ -85,7 +44,7 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         print("OBS REWARD")
         print(reward)
         done = False
-        return ob, reward, done, dict(reward_dist=0, reward_ctrl=0)
+        return ob, reward * -1 , done, dict(reward_dist=0, reward_ctrl=0)
 
     def step(self, a):
         return self._step(a)
@@ -224,13 +183,3 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         cost = np.linalg.norm(x_next[:, -3:] -  self.goal.T, axis=1)
         cost += ctrl_cost_coeff * np.sum(np.square(u), axis=1)
         return cost
-
-# def get_fingertips(x):
-#     x_cord = np.reshape(0.1 * np.cos(x[:, 0]) + 0.11 * np.cos(x[:, 0] + x[:, 1]), (-1, 1))
-#     y_cord = np.reshape(0.1 * np.sin(x[:, 0]) + 0.11 * np.sin(x[:, 0] + x[:, 1]), (-1, 1))
-#     return np.concatenate([x_cord, y_cord], axis=1)
-
-# def get_fingertips_tf(x):
-#     x_cord = tf.reshape(0.1 * tf.cos(x[:, 0]) + 0.11 * tf.cos(x[:, 0] + x[:, 1]), (-1, 1))
-#     y_cord = tf.reshape(0.1 * tf.sin(x[:, 0]) + 0.11 * tf.sin(x[:, 0] + x[:, 1]), (-1, 1))
-#     return tf.concat([x_cord, y_cord], axis=1)
