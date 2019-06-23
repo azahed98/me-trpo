@@ -145,7 +145,7 @@ def build_policy_graph(policy_scope,
     # Collecting summary
     with tf.name_scope('%s/policy_cost' % policy_scope):
         tf.summary.histogram('dist_over_models', _policy_costs)
-        tf.summary.scalar('cost_on_model0', _policy_costs[0])
+        # tf.summary.scalar('cost_on_model0', _policy_costs[0])
     policy_model(policy_training_init, collect_summary=TF_SUMMARY)
     logger.info("Built %d policy graphs for %s model" % (n_models, scope))
     return _policy_costs, n_saturates

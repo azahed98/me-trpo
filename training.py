@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import joblib
+import pickle
 import json
 import os
 import tensorflow.contrib.layers as layers
@@ -291,7 +292,7 @@ def train(variant):
         else:
             sess = get_session(interactive=True, mem_frac=1.0, use_gpu=variant['use_gpu'])
 
-        # data = joblib.load(os.path.join(working_dir, params['trpo_path']))
+        # data = pickle.loads(os.path.join(working_dir, params['trpo_path']))
         env = get_env(variant['params']['env'])
 
         # policy = data['policy']
@@ -311,7 +312,7 @@ def train(variant):
             print(n_obs)
             print(n_goals)
             print(n_states)
-            # assert n_goals+n_states == n_obs
+            assert n_goals+n_states == n_obs
         else:
             n_goals =0
             n_states = n_obs
@@ -378,7 +379,7 @@ def train(variant):
         kwargs['algo_name'] = params['algo']
         kwargs['logstd'] = training_policy._l_std_param.param
         # Save initial policy
-        # joblib.dump(training_policy, os.path.join(snapshot_dir, 'params-initial.pkl'))
+        # pickle.dumps(training_policy, os.path.join(snapshot_dir, 'params-initial.pkl'))
 
         train_models(env=env,
                      dynamics_model=dynamics_model,
@@ -401,7 +402,7 @@ def train(variant):
                      **kwargs) # Make sure not to reinitialize TRPO policy.
 
         # Save the final policy
-        # joblib.dump(training_policy, os.path.join(snapshot_dir, 'params.pkl'))
+        # pickle.dumps(training_policy, os.path.join(snapshot_dir, 'params.pkl'))
 
     except Exception as e:
         rmtree(snapshot_dir)

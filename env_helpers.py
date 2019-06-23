@@ -489,23 +489,37 @@ def evaluate_fixed_init_trajectories(env,
     n_envs = len(reset_initial_states)
     envs = [pickle.loads(pickle.dumps(env)) for _ in range(n_envs)]
     observations = reset_batch(envs, reset_initial_states)
+    # print(np.abs(observations).max())
     dones = [False for _ in range(n_envs)]
     cost = 0.0
     reward = 0.0
+    # print("Init cost:", cost)
+    # print("Init reward:", reward)
     for t in range(max_timestep):
+        # input("enter to conitue...")
         actions = sess.run(policy_out, feed_dict={policy_in: observations})
         # clipping
         actions = np.clip(actions, *env.action_space.bounds)
+        # print("Actions:", np.abs(actions).max())
         next_observations, _rewards, _dones, _ = step_batch(envs, actions)
         dones = np.logical_or(dones, _dones)
         # Update rewards and costs
+        # print("\n\n")
+        # print(_rewards)
         rewards = (1.0 - dones) * _rewards * gamma**t
         costs = (1.0-dones)*cost_np_vec(observations, actions, next_observations) * gamma**t
         # Update observation
         observations = next_observations
         cost += np.mean(costs)
         reward += np.mean(rewards)
-    assert cost + reward < 1e-2
+        # print("\n\n")
+    #     print(costs)
+    #     print(rewards)
+    #     print("Cost", t, ":", cost)
+    #     print("Reward", t, ":", reward)
+    #     print("Costs mean", t, ":", np.mean(costs))
+    #     print("Rewards mean", t, ":", np.mean(rewards))
+    # assert cost + reward < 1e-2
     return cost
 
 # def evaluate_learned_dynamics_trajectories(dynamics_in,
