@@ -14,7 +14,7 @@
     },
     "n_models": 5,
     "sample_size": 3000,
-    "sweep_iters": 100,
+    "sweep_iters": 200,
 
     "dynamics_model": {
         "hidden_layers": [
