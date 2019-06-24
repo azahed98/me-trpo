@@ -6,7 +6,7 @@ from rllab.envs.normalized_env import normalize
 from envs import  *
 
 import sys
-sys.path.insert(0, "/home/arsh/research/rllab/")
+sys.path.insert(0, "/home/azahed/rllab/")
 from sandbox.rocky.tf.envs.base import TfEnv
 
 ####################

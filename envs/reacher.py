@@ -20,7 +20,7 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.goal = np.zeros(3)
         # mujoco_env.MujocoEnv.__init__(self, os.path.join(dir_path, 'assets/reacher3d.xml'), 2)
         # self.sim = None
-        super(ReacherEnv, self).__init__(*args, **kwargs, file_path='/home/arsh/research/autolab/me-trpo/vendor/mujoco_models/reacher3d.xml')
+        super(ReacherEnv, self).__init__(*args, **kwargs, file_path='/home/azahed/me-trpo/vendor/mujoco_models/reacher3d.xml')
 
     # @property
     # def n_goals(self):

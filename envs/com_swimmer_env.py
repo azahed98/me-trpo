@@ -43,7 +43,7 @@ class SwimmerEnv(MujocoEnv, Serializable):
             ctrl_cost_coeff=1e-2,
             *args, **kwargs):
         self.ctrl_cost_coeff = ctrl_cost_coeff
-        super(SwimmerEnv, self).__init__(*args, **kwargs, file_path="/home/arsh/research/autolab/me-trpo/vendor/mujoco_models/swimmer.xml")
+        super(SwimmerEnv, self).__init__(*args, **kwargs, file_path="/home/azahed/me-trpo/vendor/mujoco_models/swimmer.xml")
         Serializable.quick_init(self, locals())
 
     def get_original_states(self):
