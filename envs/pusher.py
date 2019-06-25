@@ -17,9 +17,8 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         utils.EzPickle.__init__(self)
         dir_path = os.path.dirname(os.path.realpath(__file__))
         # mujoco_env.MujocoEnv.__init__(self, '%s/assets/pusher.xml' % dir_path, 4)
-        utils.EzPickle.__init__(self)
+        super(ReacherEnv, self).__init__(*args, **kwargs, file_path='/home/azahed/me-trpo/vendor/mujoco_models/pusher.xml')
         self.reset_model()
-        super(ReacherEnv, self).__init__(*args, **kwargs, file_path='/home/arsh/research/autolab/me-trpo/vendor/mujoco_models/pusher.xml')
 
     @property
     def n_states(self):
