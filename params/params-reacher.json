@@ -13,7 +13,7 @@
         ]
     },
     "n_models": 5,
-    "sample_size": 3000,
+    "sample_size": 200,
     "sweep_iters": 200,
 
     "dynamics_model": {

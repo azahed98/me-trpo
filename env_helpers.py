@@ -418,7 +418,7 @@ def sample_trajectories(env,
             a.append(action[0])
             r.append(reward)
             episode_reward += reward
-            # _counter += 1
+            _counter += 1
             if render_every is not None and len(Os) % render_every == 0:
                 env.render()
             if done:
@@ -450,7 +450,7 @@ def sample_trajectories(env,
             max_eps_reward = episode_reward
         if episode_reward < min_eps_reward:
             min_eps_reward = episode_reward
-        _counter += 1
+        # _counter += 1
 
       
     avg_eps_reward /= len(Os)
