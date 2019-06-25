@@ -6,7 +6,7 @@ import os
 
 import numpy as np
 from gym import utils
-from gym.envs.mujoco import mujoco_env
+from rllab.envs.mujoco import mujoco_env
 
 
 class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
