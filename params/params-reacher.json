@@ -43,7 +43,7 @@
             "threshold": 0.10,
             "_comment": ["out-of-date. use nit instead."]
         },
-        "batch_size": 1000,
+        "batch_size": 100,
         "sample_mode": "random",
         "reinitialize": 5,
         "num_passes_threshold": 25
@@ -72,16 +72,16 @@
             "init_std": 1.0,
             "step_size": 0.01,
             "discount": 1.00,
-            "batch_size": 50000,
+            "batch_size": 3000,
             "reset": true
         },
         "vpg":{
             "init_std": 1.0,
             "discount": 1.00,
-            "batch_size": 50000,
+            "batch_size": 3000,
             "reset": true
         },
-        "batch_size": 500,
+        "batch_size": 100,
         "sam_mode": "step_rand"
     },
 
