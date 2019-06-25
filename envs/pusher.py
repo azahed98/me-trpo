@@ -10,14 +10,27 @@ from gym.envs.mujoco import mujoco_env
 
 
 class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
-    def __init__(self):
+    def __init__(self,
+            ctrl_cost_coeff=1e-2,
+            *args, **kwargs):
+        self.viewer = None
+        utils.EzPickle.__init__(self)
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        mujoco_env.MujocoEnv.__init__(self, '%s/assets/pusher.xml' % dir_path, 4)
+        # mujoco_env.MujocoEnv.__init__(self, '%s/assets/pusher.xml' % dir_path, 4)
         utils.EzPickle.__init__(self)
         self.reset_model()
+        super(ReacherEnv, self).__init__(*args, **kwargs, file_path='/home/arsh/research/autolab/me-trpo/vendor/mujoco_models/pusher.xml')
+
+    @property
+    def n_states(self):
+        '''
+        :return: state dimensions
+        '''
+        return 17
+
 
     def _step(self, a):
-        obj_pos = self.get_body_com("object"),
+        obj_pos = self.get_body_com("object")
         vec_1 = obj_pos - self.get_body_com("tips_arm")
         vec_2 = obj_pos - self.get_body_com("goal")
 
@@ -70,3 +83,16 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def get_obs(self):
         return self._get_obs()
     
+    def cost_np(self, x, u, x_next, ctrl_cost_coeff=.1):
+        # obj_pos = self.get_body_com("object")
+        # vec_1 = obj_pos - self.get_body_com("tips_arm")
+        # vec_2 = obj_pos - self.get_body_com("goal")
+        vec_1 = x_next - 
+        reward_near = -np.sum(np.abs(vec_1))
+        reward_dist = -np.sum(np.abs(vec_2))
+        reward_ctrl = -np.square(u).sum()
+        reward = 1.25 * reward_dist + 0.1 * reward_ctrl + 0.5 * reward_near
+
+        return reward
+
+    def cost_tf(self, x, u, x_next, ctrl_cost_coeff=.1):
