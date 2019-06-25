@@ -104,7 +104,7 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def get_current_obs(self):
         return self._get_obs()
 
-        def get_EE_pos(self, states):
+    def get_EE_pos(self, states):
         theta1, theta2, theta3, theta4, theta5, theta6, theta7 = \
             states[:, :1], states[:, 1:2], states[:, 2:3], states[:, 3:4], states[:, 4:5], states[:, 5:6], states[:, 6:]
 
