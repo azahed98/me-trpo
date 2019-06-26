@@ -99,7 +99,6 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         reward_dist = -np.sum(np.abs(vec_2))
         reward_ctrl = -np.square(u).sum()
         reward = 1.25 * reward_dist + 0.1 * reward_ctrl + 0.5 * reward_near
-        print("\nCOSTS:", self.old_cost_np(x, u, x_next), reward)
         return reward
         
     def old_cost_np(self, x, u, x_next, ctrl_cost_coeff=.1):
