@@ -106,6 +106,7 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         v.cam.distance = v.model.stat.extent
 
     def cost_np(self, x, u, x_next, ctrl_cost_coeff=.1):
+        cost_lscale = CartpoleEnv.PENDULUM_LENGTH
         if len(x_next.shape) == 2:
             return np.mean(self.cost_np_vec(x, u, x_next, ctrl_cost_coeff))
         cost = -1 * np.exp(
@@ -116,6 +117,7 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
 
     def cost_tf(self, x, u, x_next, ctrl_cost_coeff=.1):
+        cost_lscale = CartpoleEnv.PENDULUM_LENGTH
         cost = -1 * tf.exp(
             -tf.reduce_sum(np.square(self._get_ee_pos_tf(x_next) - np.array([0.0, CartpoleEnv.PENDULUM_LENGTH])), axis=1) / (cost_lscale ** 2)
         )
