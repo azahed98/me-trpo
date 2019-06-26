@@ -47,6 +47,12 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         '''
         return 4
 
+    @property
+    def n_states(self):
+        '''
+        :return: state dimensions
+        '''
+        return 2
     def reset_model(self, init_state=None):
         if init_state is None:
             qpos = self.init_qpos.copy() + np.random.normal(0, 0.1, np.shape(self.init_qpos))

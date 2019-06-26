@@ -35,7 +35,7 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         '''
         return 17
 
-    
+
     def _step(self, a):
         # self.do_simulation(a, self.frame_skip)
         self.forward_dynamics(a)
