@@ -76,7 +76,8 @@ if __name__ == '__main__':
                        'swimmer',
                        'humanoid',
                        'pusher',
-                       'reacher']:
+                       'reacher',
+                       'cartpole']:
         # param_path = os.path.join(working_dir,
         #                           'sandbox/thanard/me-trpo/params/params-%s.json' % options.env)
         param_path = '/home/azahed/me-trpo/params/params-%s.json' % options.env

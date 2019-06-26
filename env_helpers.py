@@ -36,6 +36,8 @@ def get_env(env_name):
         return TfEnv(normalize(ReacherEnv()))
     elif env_name == 'pusher':
         return TfEnv(normalize(PusherEnv()))
+    elif env_name == 'cartpole':
+        return TfEnv(normalize(CartpoleEnv()))
     else:
         assert False, "Define the env from env_name."
 
