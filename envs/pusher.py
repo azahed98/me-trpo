@@ -194,7 +194,7 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         print(self.get_body_com("object"), self.get_body_com("tips_arm"))
         obj_pos = x_next[:, -3:]
         ee_pos = x_next[:, -6:-3]
-        goal_pos = tf.constant(self.get_body_com("goal").reshape((1,3)), dtype=tf.float64)
+        goal_pos = tf.constant(self.get_body_com("goal").reshape((1,3)), dtype=tf.float32)
         vec_1 = obj_pos - ee_pos
         vec_2 = obj_pos - goal_pos
         # vec_1 = obj_pos - self.get_EE_pos_tf(x_next)
