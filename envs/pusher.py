@@ -38,9 +38,9 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # reward_dist = -np.sum(np.abs(vec_2))
         # reward_ctrl = -np.square(a).sum()
         # reward = 1.25 * reward_dist + 0.1 * reward_ctrl + 0.5 * reward_near
-        reward = -1 * self.cost_np(None, a, None)
         self.do_simulation(a, self.frame_skip)
         ob = self._get_obs()
+        reward = -1 * self.cost_np(None, a, ob)
         done = False
         return ob, reward, done, {}
 
