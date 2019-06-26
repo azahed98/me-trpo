@@ -8,6 +8,7 @@ import numpy as np
 from gym import utils
 from rllab.envs.mujoco import mujoco_env
 
+import tensorflow as tf
 
 class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     PENDULUM_LENGTH = 0.6
