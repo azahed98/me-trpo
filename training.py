@@ -130,6 +130,7 @@ def train(variant):
                           collect_summary,
                           prediction_type):
             name_scope = '%s/%s' % (scope_name, variable_name)
+            print(n_states, n_actions, n_goals)
             assert n_states > 1 and n_actions > 1 \
                    and xgu.shape[1] == n_states + n_actions + n_goals
             xu = tf.concat([xgu[:, :n_states], xgu[:, n_states + n_goals:]], axis=1)
