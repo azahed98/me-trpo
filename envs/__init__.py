@@ -6,3 +6,4 @@ from .com_hopper_env import HopperEnv
 from .com_ant_env import AntEnv
 from .com_humanoid_env import HumanoidEnv
 from .reacher import ReacherEnv
+from .pusher import PusherEnv

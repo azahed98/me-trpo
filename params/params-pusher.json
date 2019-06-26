@@ -1,7 +1,7 @@
 {
     "algo": "trpo",
     "_comment_algo":["bptt, trpo, or svg"],
-    "env": "reacher",
+    "env": "pusher",
     "policy":{
         "hidden_layers": [
             32,

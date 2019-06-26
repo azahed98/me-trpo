@@ -34,6 +34,8 @@ def get_env(env_name):
     #     return TfEnv(normalize(SimpleHumanoidEnv()))
     elif env_name == 'reacher':
         return TfEnv(normalize(ReacherEnv()))
+    elif env_name == 'pusher':
+        return TfEnv(normalize(PusherEnv()))
     else:
         assert False, "Define the env from env_name."
 
@@ -452,7 +454,7 @@ def sample_trajectories(env,
             min_eps_reward = episode_reward
         # _counter += 1
 
-      
+
     avg_eps_reward /= len(Os)
     rllab_logger.record_tabular('EpisodesCollected', len(Os))
     rllab_logger.record_tabular('TimeStepsCollected', _counter - 1)
