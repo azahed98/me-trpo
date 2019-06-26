@@ -86,8 +86,8 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def _get_ee_pos(x):
         x0, theta = x[0], x[1]
         return np.array([
-            tf.expand_dims(x0 - CartpoleEnv.PENDULUM_LENGTH * np.sin(theta), 1),
-            tf.expand_dims(-CartpoleEnv.PENDULUM_LENGTH * np.cos(theta), 1)
+            x0 - CartpoleEnv.PENDULUM_LENGTH * np.sin(theta),
+            -CartpoleEnv.PENDULUM_LENGTH * np.cos(theta)
         ])
 
     @staticmethod
@@ -96,8 +96,8 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         print(x0)
         print(theta)
         return tf.concat([
-            x0 - CartpoleEnv.PENDULUM_LENGTH * tf.sin(theta),
-            -CartpoleEnv.PENDULUM_LENGTH * tf.cos(theta)
+            tf.expand_dims(x0 - CartpoleEnv.PENDULUM_LENGTH * tf.sin(theta),1),
+            tf.expand_dims(-CartpoleEnv.PENDULUM_LENGTH * tf.cos(theta),1)
         ], axis=1)
 
     def viewer_setup(self):
