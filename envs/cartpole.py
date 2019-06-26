@@ -95,7 +95,7 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         x0, theta = x[:,0], x[:,1]
         return tf.concat([
             x0 - CartpoleEnv.PENDULUM_LENGTH * tf.sin(theta),
-            -tf.constant(CartpoleEnv.PENDULUM_LENGTH * tf.cos(theta))
+            -CartpoleEnv.PENDULUM_LENGTH * tf.cos(theta)
         ], axis=1)
 
     def viewer_setup(self):
