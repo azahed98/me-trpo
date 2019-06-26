@@ -107,74 +107,17 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def get_current_obs(self):
         return self._get_obs()
 
-    def get_EE_pos(self, states):
-        theta1, theta2, theta3, theta4, theta5, theta6, theta7 = \
-            states[:, :1], states[:, 1:2], states[:, 2:3], states[:, 3:4], states[:, 4:5], states[:, 5:6], states[:, 6:]
-
-        rot_axis = np.concatenate([np.cos(theta2) * np.cos(theta1), np.cos(theta2) * np.sin(theta1), -np.sin(theta2)],
-                                  axis=1)
-        rot_perp_axis = np.concatenate([-np.sin(theta1), np.cos(theta1), np.zeros(theta1.shape)], axis=1)
-        cur_end = np.concatenate([
-            0.1 * np.cos(theta1) + 0.4 * np.cos(theta1) * np.cos(theta2),
-            0.1 * np.sin(theta1) + 0.4 * np.sin(theta1) * np.cos(theta2) - 0.188,
-            -0.4 * np.sin(theta2)
-        ], axis=1)
-
-        for length, hinge, roll in [(0.321, theta4, theta3), (0.16828, theta6, theta5)]:
-            perp_all_axis = np.cross(rot_axis, rot_perp_axis)
-            x = np.cos(hinge) * rot_axis
-            y = np.sin(hinge) * np.sin(roll) * rot_perp_axis
-            z = -np.sin(hinge) * np.cos(roll) * perp_all_axis
-            new_rot_axis = x + y + z
-            new_rot_perp_axis = np.cross(new_rot_axis, rot_axis)
-            new_rot_perp_axis[np.linalg.norm(new_rot_perp_axis, axis=1) < 1e-20] = \
-                rot_perp_axis[np.linalg.norm(new_rot_perp_axis, axis=1) < 1e-20]
-            new_rot_perp_axis /= np.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
-            rot_axis, rot_perp_axis, cur_end = new_rot_axis, new_rot_perp_axis, cur_end + length * new_rot_axis
-
-        return cur_end
-
-    def get_EE_pos_tf(self, states):
-        # raise NotImplementedError
-        theta1, theta2, theta3, theta4, theta5, theta6, theta7 = \
-            states[:, :1], states[:, 1:2], states[:, 2:3], states[:, 3:4], states[:, 4:5], states[:, 5:6], states[:, 6:]
-
-        rot_axis = tf.concat([tf.cos(theta2) * tf.cos(theta1), tf.cos(theta2) * tf.sin(theta1), -tf.sin(theta2)],
-                                  axis=1)
-        rot_perp_axis = tf.concat([-tf.sin(theta1), tf.cos(theta1), tf.zeros_like(theta1)], axis=1)
-        cur_end = tf.concat([
-            0.1 * tf.cos(theta1) + 0.4 * tf.cos(theta1) * tf.cos(theta2),
-            0.1 * tf.sin(theta1) + 0.4 * tf.sin(theta1) * tf.cos(theta2) - 0.188,
-            -0.4 * tf.sin(theta2)
-        ], axis=1)
-
-        for length, hinge, roll in [(0.321, theta4, theta3), (0.16828, theta6, theta5)]:
-            perp_all_axis = tf.cross(rot_axis, rot_perp_axis)
-            x = tf.cos(hinge) * rot_axis
-            y = tf.sin(hinge) * tf.sin(roll) * rot_perp_axis
-            z = -tf.sin(hinge) * tf.cos(roll) * perp_all_axis
-            new_rot_axis = x + y + z
-            new_rot_perp_axis = tf.cross(new_rot_axis, rot_axis)
-            new_rot_perp_axis_norm = tf.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
-            condition = tf.less(new_rot_perp_axis_norm, 1e-20)
-            new_rot_perp_axis_norm = tf.where(condition, tf.linalg.norm(rot_perp_axis,axis=1, keepdims=True), new_rot_perp_axis_norm )
-            # new_rot_perp_axis[tf.linalg.norm(new_rot_perp_axis, axis=1) < 1e-30] = \
-            #     rot_perp_axis[tf.linalg.norm(new_rot_perp_axis, axis=1) < 1e-30]
-            new_rot_perp_axis /= new_rot_perp_axis_norm#tf.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
-            rot_axis, rot_perp_axis, cur_end = new_rot_axis, new_rot_perp_axis, cur_end + length * new_rot_axis
-
-        return cur_end
-
     def cost_np(self, x, u, x_next, ctrl_cost_coeff=.1):
         # obj_pos = self.get_body_com("object")
         # vec_1 = obj_pos - self.get_EE_pos(x_next)
         # vec_2 = obj_pos - self.get_body_com("goal")
-        if (x_next.shape) == 2:
+        if len(x_next.shape) == 2:
             obj_pos = x_next[:, -3:]
             ee_pos = x_next[:, -6:-3]
         else:
             obj_pos = x_next[-3:]
             ee_pos = x_next[-6:-3]
+
         goal_pos = self.get_body_com("goal").reshape((1,3))
         vec_1 = obj_pos - ee_pos
         vec_2 = obj_pos - goal_pos
