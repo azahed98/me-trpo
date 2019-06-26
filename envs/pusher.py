@@ -191,7 +191,6 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return reward
 
     def cost_tf(self, x, u, x_next, ctrl_cost_coeff=.1):
-        print(self.get_body_com("object"), self.get_body_com("tips_arm"))
         obj_pos = x_next[:, -3:]
         ee_pos = x_next[:, -6:-3]
         goal_pos = tf.constant(self.get_body_com("goal").reshape((1,3)), dtype=tf.float32)
@@ -203,6 +202,7 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         reward_dist = -tf.reduce_sum(np.abs(vec_2), axis=1)
         reward_ctrl = -tf.reduce_sum(tf.square(u), axis=1)
         reward = 1.25 * reward_dist + 0.1 * reward_ctrl + 0.5 * reward_near
+        return reward
 
     def cost_np_vec(self, x, u, x_next, ctrl_cost_coeff=.1):
         cost = np.array([self.cost_np(None, u[i], x_next[i], ctrl_cost_coeff) for i in range(x_next.shape[0])])
