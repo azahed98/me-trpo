@@ -5,6 +5,7 @@ from __future__ import absolute_import
 import os
 
 import numpy as np
+import tensorflow as tf
 from gym import utils
 from rllab.envs.mujoco import mujoco_env
 
