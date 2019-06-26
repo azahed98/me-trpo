@@ -191,7 +191,7 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         vec_2 = obj_pos - self.get_body_com("goal")
         reward_near = -tf.reduce_sum(np.abs(vec_1))
         reward_dist = -tf.reduce_sum(np.abs(vec_2))
-        reward_ctrl = -tf.reduce_sum(tf.square(u), axis=1)
+        reward_ctrl = -tf.reduce_sum(tf.square(u))
         reward = 1.25 * reward_dist + 0.1 * reward_ctrl + 0.5 * reward_near
 
     def cost_np_vec(self, x, u, x_next, ctrl_cost_coeff=.1):
