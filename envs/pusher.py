@@ -169,8 +169,12 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # obj_pos = self.get_body_com("object")
         # vec_1 = obj_pos - self.get_EE_pos(x_next)
         # vec_2 = obj_pos - self.get_body_com("goal")
-        obj_pos = x_next[:, -3:]
-        ee_pos = x_next[:, -6:-3]
+        if (x_next.shape) == 2
+            obj_pos = x_next[:, -3:]
+            ee_pos = x_next[:, -6:-3]
+        else:
+            obj_pos = x_next[-3:]
+            ee_pos = x_next[-6:-3]
         goal_pos = self.get_body_com("goal").reshape((1,3))
         vec_1 = obj_pos - ee_pos
         vec_2 = obj_pos - goal_pos
