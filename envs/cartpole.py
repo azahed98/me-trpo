@@ -40,23 +40,27 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def step(self, a):
         return self._step(a)
 
+    @property
+    def n_states(self):
+        '''
+        :return: state dimensions
+        '''
+        return 4
 
     def reset_model(self, init_state=None):
-        print(np.shape(self.init_qpos), np.shape(self.init_qvel))
         if init_state is None:
             qpos = self.init_qpos.copy() + np.random.normal(0, 0.1, np.shape(self.init_qpos))
             qvel = self.init_qvel.copy() + np.random.normal(0, 0.1, np.shape(self.init_qvel))
             init_state = np.vstack([qpos, qvel, np.zeros(shape=(17,1))])
         else:
-            qpos = init_state[:7]
-            qvel = init_state[7:]
+            qpos = init_state[:2]
+            qvel = init_state[2:]
         # self.set_state(qpos, qvel)
         self.reset_mujoco(init_state)
         self.model.forward()
         self.current_com = self.model.data.com_subtree[0]
         self.dcom = np.zeros_like(self.current_com)
         obs = self._get_obs()
-        print(obs, obs.shape)
         return obs
 
     def reset(self, init_state=None):
