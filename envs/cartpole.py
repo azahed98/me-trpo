@@ -20,6 +20,7 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         # mujoco_env.MujocoEnv.__init__(self, '%s/assets/cartpole.xml' % dir_path, 2)
         super(CartpoleEnv, self).__init__(*args, **kwargs, file_path='/home/azahed/me-trpo/vendor/mujoco_models/cartpole.xml')
+        self.reset_model()
 
     def _step(self, a):
         # self.do_simulation(a, self.frame_skip)
@@ -54,7 +55,9 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.model.forward()
         self.current_com = self.model.data.com_subtree[0]
         self.dcom = np.zeros_like(self.current_com)
-        return self._get_obs()
+        obs = self._get_obs()
+        print(obs, obs.shape)
+        return obs
 
     def reset(self, init_state=None):
         return self.reset_model(init_state)
