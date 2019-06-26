@@ -152,8 +152,6 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             new_rot_perp_axis_norm = tf.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
             condition = tf.less(new_rot_perp_axis_norm, 1e-20)
             new_rot_perp_axis_norm = tf.where(condition, tf.linalg.norm(rot_perp_axis,axis=1, keepdims=True), new_rot_perp_axis_norm )
-            # new_rot_perp_axis[tf.linalg.norm(new_rot_perp_axis, axis=1) < 1e-30] = \
-            #     rot_perp_axis[tf.linalg.norm(new_rot_perp_axis, axis=1) < 1e-30]
             new_rot_perp_axis /= new_rot_perp_axis_norm#tf.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
             rot_axis, rot_perp_axis, cur_end = new_rot_axis, new_rot_perp_axis, cur_end + length * new_rot_axis
 
