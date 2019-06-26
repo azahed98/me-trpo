@@ -93,8 +93,6 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     @staticmethod
     def _get_ee_pos_tf(x):
         x0, theta = x[:,0], x[:,1]
-        print(x0)
-        print(theta)
         return tf.concat([
             tf.expand_dims(x0 - CartpoleEnv.PENDULUM_LENGTH * tf.sin(theta),1),
             tf.expand_dims(-CartpoleEnv.PENDULUM_LENGTH * tf.cos(theta),1)
