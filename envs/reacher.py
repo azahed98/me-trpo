@@ -35,7 +35,7 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         '''
         return 17
 
-    
+
     def _step(self, a):
         # self.do_simulation(a, self.frame_skip)
         self.forward_dynamics(a)
@@ -152,34 +152,23 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             new_rot_perp_axis_norm = tf.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
             condition = tf.less(new_rot_perp_axis_norm, 1e-20)
             new_rot_perp_axis_norm = tf.where(condition, tf.linalg.norm(rot_perp_axis,axis=1, keepdims=True), new_rot_perp_axis_norm )
-            # new_rot_perp_axis[tf.linalg.norm(new_rot_perp_axis, axis=1) < 1e-30] = \
-            #     rot_perp_axis[tf.linalg.norm(new_rot_perp_axis, axis=1) < 1e-30]
             new_rot_perp_axis /= new_rot_perp_axis_norm#tf.linalg.norm(new_rot_perp_axis, axis=1, keepdims=True)
             rot_axis, rot_perp_axis, cur_end = new_rot_axis, new_rot_perp_axis, cur_end + length * new_rot_axis
 
         return cur_end
 
     def cost_np(self, x, u, x_next, ctrl_cost_coeff=.1):
-        # return self.cost_np_vec(x, u.reshape(1,-1), x_next.reshape(1,-1), ctrl_cost_coeff)
-        # assert len(x_next.shape) <= 2
         if len(x_next.shape) == 2:
-            # assert x_next.shape[0] <= 1, str(x_next.shape)
             return np.mean(self.cost_np_vec(x, u, x_next, ctrl_cost_coeff))
         cost = np.sum(np.square(self.get_EE_pos(x_next.reshape(1,-1)) - self.goal.T))
         cost += ctrl_cost_coeff * np.square(u).sum()
-        if np.isnan(cost).any():
-            print(x, u, x_next, ctrl_cost_coeff)
-            input("NAN DETECTED!!!!\n")
         return cost
-        # return np.mean(np.linalg.norm(x[:, -2:]-get_fingertips(x), axis=1) +\
-        #                ctrl_cost_coeff*0.5*np.sum(np.square(u), axis=1))
+
 
     def cost_tf(self, x, u, x_next, ctrl_cost_coeff=.1):
         cost = tf.reduce_sum(tf.square(self.get_EE_pos_tf(x_next) - self.goal.T), axis=1)
         cost += ctrl_cost_coeff * tf.reduce_sum(tf.square(u), axis=1)
         return cost
-        # return tf.reduce_mean(tf.norm(x[:, -2:]-get_fingertips_tf(x), axis=1) +\
-        #                ctrl_cost_coeff*0.5*tf.reduce_sum(tf.square(u), axis=1))
 
     def cost_np_vec(self, x, u, x_next, ctrl_cost_coeff=.1):
         # cost = np.sum(np.square(self.get_EE_pos(x_next) -  self.goal.T), axis=1)
