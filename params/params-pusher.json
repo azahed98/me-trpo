@@ -4,8 +4,8 @@
     "env": "pusher",
     "policy":{
         "hidden_layers": [
-            32,
-            32
+            64,
+            64
         ],
         "output_nonlinearity": "tf.identity",
         "_comment_policy": [
