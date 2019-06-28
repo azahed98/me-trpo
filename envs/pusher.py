@@ -26,7 +26,7 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         '''
         :return: state dimensions
         '''
-        return 17
+        return 20
 
 
     def _step(self, a):
@@ -95,22 +95,22 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         goal_pos = self.get_body_com("goal").reshape((1,3))
         vec_1 = obj_pos - ee_pos
         vec_2 = obj_pos - goal_pos
-        reward_near = -np.sum(np.abs(vec_1))
-        reward_dist = -np.sum(np.abs(vec_2))
-        reward_ctrl = -np.square(u).sum()
+        reward_near = np.sum(np.abs(vec_1))
+        reward_dist = np.sum(np.abs(vec_2))
+        reward_ctrl = np.square(u).sum()
         reward = 1.25 * reward_dist + 0.1 * reward_ctrl + 0.5 * reward_near
-        return -1 * reward
+        return reward
         
     def old_cost_np(self, x, u, x_next, ctrl_cost_coeff=.1):
         obj_pos = self.get_body_com("object")
         vec_1 = obj_pos - self.get_body_com("tips_arm")
         vec_2 = obj_pos - self.get_body_com("goal")
-        reward_near = -np.sum(np.abs(vec_1))
-        reward_dist = -np.sum(np.abs(vec_2))
-        reward_ctrl = -np.square(u).sum()
+        reward_near = np.sum(np.abs(vec_1))
+        reward_dist = np.sum(np.abs(vec_2))
+        reward_ctrl = np.square(u).sum()
         reward = 1.25 * reward_dist + 0.1 * reward_ctrl + 0.5 * reward_near
 
-        return -1 * reward
+        return reward
 
     def cost_tf(self, x, u, x_next, ctrl_cost_coeff=.1):
         obj_pos = x_next[:, -3:]
@@ -118,11 +118,11 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         goal_pos = tf.constant(self.get_body_com("goal").reshape((1,3)), dtype=tf.float32)
         vec_1 = obj_pos - ee_pos
         vec_2 = obj_pos - goal_pos
-        reward_near = -tf.reduce_sum(np.abs(vec_1), axis=1)
-        reward_dist = -tf.reduce_sum(np.abs(vec_2), axis=1)
-        reward_ctrl = -tf.reduce_sum(tf.square(u), axis=1)
+        reward_near = tf.reduce_sum(tf.abs(vec_1), axis=1)
+        reward_dist = tf.reduce_sum(tf.abs(vec_2), axis=1)
+        reward_ctrl = tf.reduce_sum(tf.square(u), axis=1)
         reward = 1.25 * reward_dist + 0.1 * reward_ctrl + 0.5 * reward_near
-        return -1 * reward
+        return reward
 
     def cost_np_vec(self, x, u, x_next, ctrl_cost_coeff=.1):
         cost = np.array([self.cost_np(None, u[i], x_next[i], ctrl_cost_coeff) for i in range(x_next.shape[0])])
