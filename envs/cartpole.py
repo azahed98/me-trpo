@@ -29,10 +29,6 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         ob = self._get_obs()
 
         cost_lscale = CartpoleEnv.PENDULUM_LENGTH
-        # reward = np.exp(
-        #     -np.sum(np.square(self._get_ee_pos(ob) - np.array([0.0, CartpoleEnv.PENDULUM_LENGTH]))) / (cost_lscale ** 2)
-        # )
-        # reward -= 0.01 * np.sum(np.square(a))
         reward = -1 * self.cost_np(None, a, ob)
 
         done = False
@@ -110,7 +106,7 @@ class CartpoleEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def cost_tf(self, x, u, x_next, ctrl_cost_coeff=.01):
         cost_lscale = CartpoleEnv.PENDULUM_LENGTH
         cost = -1 * tf.exp(
-            -tf.reduce_sum(np.square(self._get_ee_pos_tf(x_next) - np.array([0.0, CartpoleEnv.PENDULUM_LENGTH])), axis=1) / (cost_lscale ** 2)
+            -tf.reduce_sum(tf.square(self._get_ee_pos_tf(x_next) - tf.constant(np.array([0.0, CartpoleEnv.PENDULUM_LENGTH]))), axis=1) / (cost_lscale ** 2)
         )
         cost += 0.01 * tf.reduce_sum(tf.square(u), axis=1)
         return cost
